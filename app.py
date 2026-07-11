@@ -31,6 +31,7 @@ z_threshold = st.sidebar.slider(
 # -----------------------------------------------------------
 # 2. 데이터 수집 (OpenSky API)
 # -----------------------------------------------------------
+@st.cache_data(ttl=10)  # 핵심 해결책: 10초 동안 API 호출 결과를 임시 저장(캐싱)합니다.
 def get_flight_data():
     url = "https://opensky-network.org/api/states/all"
     params = {"lamin": 33.0, "lamax": 39.0, "lomin": 124.0, "lomax": 132.0}
@@ -41,9 +42,8 @@ def get_flight_data():
             return data["states"]
         return []
     except Exception as e:
-        st.error(f"데이터를 가져오는 중 오류가 발생했습니다: {e}")
+        # [주의] 캐시 함수 내부에서는 st.error 사용을 피하는 것이 좋습니다.
         return []
-
 raw_data = get_flight_data()
 
 # -----------------------------------------------------------
